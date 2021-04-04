@@ -24,6 +24,7 @@ public class MySqlCourseDAO extends MySqlDAO implements ICourseDAOInterface {
 
     }
 
+    @Override
     public Map<String, Course> getCourses() {
         return courses;
     }

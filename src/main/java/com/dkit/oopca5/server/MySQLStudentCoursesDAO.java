@@ -10,8 +10,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesDAOInterface {
-    private MySqlStudentDAO studentDatabase;
-    private MySqlCourseDAO courseDatabase;
+    private IStudentDAOInterface studentDatabase;
+    private ICourseDAOInterface courseDatabase;
 
     private Map<Integer, List<String>> studentChoices;
     private Map<String, Course> courses;
@@ -19,7 +19,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
     private boolean login;
     private int caoNumber;
 
-    public MySQLStudentCoursesDAO(MySqlStudentDAO studentDatabase, MySqlCourseDAO courseDatabase) {
+    public MySQLStudentCoursesDAO(IStudentDAOInterface studentDatabase, ICourseDAOInterface courseDatabase) {
         this.studentDatabase = studentDatabase;
         this.courseDatabase = courseDatabase;
         this.login=false;
@@ -38,7 +38,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         try
         {
             con = this.getConnection();
-            String query = "select * from user";
+            String query = "select * from student_choices";
             ps = con.prepareStatement(query);
             rs = ps.executeQuery();
 
@@ -82,7 +82,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
             }
         }
     }
-
+@Override
    public void updateChoices(List<String> courseID)
    {
        if(studentChoices.containsKey(caoNumber))
@@ -115,7 +115,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
             studentChoices.get(caoNumber).remove(i);
         }
     }
-
+    @Override
     public boolean login(int caoNumber,String dateOfBirth,String password)
     {
         for(Map.Entry<Integer, Student> entry : students.entrySet())
@@ -128,6 +128,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         }
         return login;
     }
+    @Override
     public void displayCourse(String courseId)
     {
         String message=null;
@@ -146,12 +147,14 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
             System.out.println(message);
         }
     }
+    @Override
     public void displayAllCourses(){
         for(Map.Entry<String, Course> entry : courses.entrySet())
         {
             System.out.println(entry.getValue());
         }
     }
+    @Override
     public void displayCurrentChoices(int caoNumber){
       
             if(studentChoices.containsKey(this.caoNumber))
