@@ -82,6 +82,40 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
             }
         }
     }
+
+   public void updateChoices(List<String> courseID)
+   {
+       if(studentChoices.containsKey(caoNumber))
+       {
+           if(studentChoices.get(caoNumber)!=null)
+           {
+               removeStudentChoices(caoNumber);
+           }
+           try{
+               for(int i=0;i<courseID.size();i++)
+               {
+                   studentChoices.get(caoNumber).add(courseID.get(i));
+               }
+
+           }
+           catch(NullPointerException npe)
+           {
+               System.out.println(npe.getMessage());
+           }
+
+       }
+       else
+       {
+           studentChoices.put(caoNumber,courseID);
+       }
+   }
+    public void removeStudentChoices(int caoNumber){
+        for(int i=0;i<studentChoices.get(caoNumber).size();i++)
+        {
+            studentChoices.get(caoNumber).remove(i);
+        }
+    }
+
     public boolean login(int caoNumber,String dateOfBirth,String password)
     {
         for(Map.Entry<Integer, Student> entry : students.entrySet())
@@ -94,14 +128,14 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         }
         return login;
     }
-    public Course displayCourse(String courseId)
+    public void displayCourse(String courseId)
     {
         String message=null;
         for(Map.Entry<String, Course> entry : courses.entrySet())
         {
             if(courseId.equals(entry.getKey()))
             {
-                return entry.getValue();
+                System.out.println(entry.getValue().toString());
             }
             else{
                 message="Course was not found";
@@ -111,7 +145,29 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         {
             System.out.println(message);
         }
-        return  null;
     }
-    
+    public void displayAllCourses(){
+        for(Map.Entry<String, Course> entry : courses.entrySet())
+        {
+            System.out.println(entry.getValue());
+        }
+    }
+    public void displayCurrentChoices(int caoNumber){
+      
+            if(studentChoices.containsKey(this.caoNumber))
+            {
+                for(Map.Entry<String, Course> entry : courses.entrySet())
+                {
+                    for(int j=0;j<studentChoices.get(caoNumber).size();j++)
+                    {
+                        if(entry.getKey().equalsIgnoreCase(studentChoices.get(caoNumber).get(j)))
+                        {
+                            System.out.println(entry.getValue().toString());
+                        }
+                    }
+                }
+            }
+
+    }
+
 }

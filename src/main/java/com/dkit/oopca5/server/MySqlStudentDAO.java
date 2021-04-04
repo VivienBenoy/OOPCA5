@@ -76,4 +76,43 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
             }
         }
     }
+
+    @Override
+    public void registerStudent(int caoNumber,String dateOfbirth,String password) throws DAOException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try
+        {
+            con = this.getConnection();
+            String query = "insert into student(caoNumber,date_of_birth,password) values('"+caoNumber+"','"+dateOfbirth+"','"+password+"')";
+            ps = con.prepareStatement(query);
+            rs = ps.executeQuery();
+
+        } catch (SQLException se)
+        {
+            throw new DAOException("registerStudent() " + se.getMessage());
+        } finally
+        {
+            try
+            {
+                if (rs != null)
+                {
+                    rs.close();
+                }
+                if (ps != null)
+                {
+                    ps.close();
+                }
+                if (con != null)
+                {
+                    freeConnection(con);
+                }
+            } catch (SQLException se)
+            {
+                throw new DAOException("registerStudent() finally " + se.getMessage());
+            }
+        }
+    }
 }
