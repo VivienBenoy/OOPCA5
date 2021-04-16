@@ -61,7 +61,6 @@ public class CAOService
     public static List<Course> recreateCourseList(String courses)
     {
         List<Course> courseList = new ArrayList<>();
-        //Now taskStrings will contain - Finish correcting ca5 del one%%John%%8888888888 and Read masters thesis%%John%%9999999999
         String[] courseStrings = courses.split(CAOService.COURSE_SEPARATOR);
         for (String course : courseStrings)
         {
@@ -77,4 +76,4 @@ public class CAOService
         return courseList;
     }
 }
-}
+

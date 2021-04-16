@@ -1,5 +1,7 @@
 package com.dkit.oopca5.core.dto;
 
+import com.dkit.oopca5.core.CAOService;
+
 public class Course {
     private String courseId;
     private int level;
@@ -37,5 +39,9 @@ public class Course {
                 ", title='" + title + '\'' +
                 ", institution='" + institution + '\'' +
                 '}';
+    }
+    public String format()
+    {
+        return this.courseId+ CAOService.BREAKING_CHARACTER+this.level+CAOService.BREAKING_CHARACTER+this.title+CAOService.BREAKING_CHARACTER+this.institution;
     }
 }
