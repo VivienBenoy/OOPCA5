@@ -9,6 +9,7 @@ import com.dkit.oopca5.core.CAOService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class CAOClientHandler implements  Runnable
@@ -62,6 +63,9 @@ public class CAOClientHandler implements  Runnable
 
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
+        }catch (NoSuchElementException nse)
+        {
+            System.out.println(nse.getMessage());
         }
 
     }

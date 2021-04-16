@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface IStudentDAOInterface {
     public void loadFromDatabase() throws DAOException;
-    public void registerStudent(int caoNumber,String dateOfBirth,String password) throws DAOException;
+    public void registerStudent(int caoNumber,String dateOfBirth,String password);
     public Map<Integer, Student> getStudents() ;
 
 }

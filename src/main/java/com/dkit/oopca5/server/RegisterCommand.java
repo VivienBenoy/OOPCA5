@@ -14,19 +14,17 @@ public class RegisterCommand implements ICommand{
                 String dateOfbirth = components[2];
                 String password = components[3];
                 studentDAO.registerStudent(caoNumber, dateOfbirth, password);
-                if(studentDAO.getStudents().containsKey(caoNumber))
-                {
-                    registered=true;
+                if (studentDAO.getStudents().containsKey(caoNumber)) {
+                    registered = true;
                 }
-                if(registered)
-                {
-                    response= CAOService.SUCCESSFUL_REGISTER;
+                if (registered) {
+                    response = CAOService.SUCCESSFUL_REGISTER;
+                } else {
+                    response = CAOService.FAILED_REGISTER;
                 }
-                else{
-
-                }
-            } catch (DAOException e) {
-                response=CAOService.FAILED_REGISTER;
+            }catch (NumberFormatException e)
+            {
+                System.out.println(e.getMessage());
             }
 
         }

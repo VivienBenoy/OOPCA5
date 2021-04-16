@@ -63,7 +63,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
                     courses.add(courseID);
                     studentChoices.put(caoNumber,courses);
                 }
-
+                System.out.println(studentChoices.toString());
             }
         } catch (SQLException se)
         {
