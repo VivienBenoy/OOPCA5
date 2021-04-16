@@ -15,9 +15,16 @@ public class CAOClientHandler implements  Runnable
 {
     private Socket clientSocket;
     private int clientNumber;
-    public CAOClientHandler(Socket clientSocket,int clientNumber){
+    private IStudentCoursesDAOInterface studentCourseDAO;
+    private IStudentDAOInterface studentDAO;
+    private ICourseDAOInterface courseDAO;
+    public CAOClientHandler(Socket clientSocket,int clientNumber,IStudentCoursesDAOInterface studentCourseDAO,IStudentDAOInterface studentAO,ICourseDAOInterface courseDAO){
+
         this.clientSocket=clientSocket;
         this.clientNumber=clientNumber;
+        this.studentCourseDAO=studentCourseDAO;
+        this.studentDAO=studentAO;
+        this.courseDAO=courseDAO;
 
 
     }
@@ -35,24 +42,24 @@ public class CAOClientHandler implements  Runnable
 
                 String components[]=request.split(CAOService.BREAKING_CHARACTER);
                 String response=null;
-//                ICommand command = CommandFactory.createCommand(components[0]);
-//
-//                if (command != null)
-//                {
-//                    response = command.generateResponse(components, taskList);
-//                    if (response != null)
-//                    {
-//                        clientOutput.println(response);
-//                        if (command instanceof ExitCommand)
-//                        {
-//                            sessionActive = false;
-//                        }
-//                    }
-//                }
-//            }
-//
-//            clientSocket.close();
+                ICommand command = CommandFactory.createCommand(components[0]);
+
+                if (command != null)
+                {
+                    response = command.generateResponse(components,studentDAO,courseDAO,studentCourseDAO);
+                    if (response != null)
+                    {
+                        clientOutput.println(response);
+                        if (command instanceof QuitCommand)
+                        {
+                            active = false;
+                        }
+                    }
+                }
             }
+
+            clientSocket.close();
+
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
         }

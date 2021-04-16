@@ -26,6 +26,7 @@ public class CAOService
 
     public static final String LOGOUT="LOGOUT";
     public static final String SUCCESSFUL_LOGOUT="LOGGED OUT";
+    public static final String FAILED_LOGOUT="FAILED TO LOG OUT";
 
     public static final String DISPLAY_COURSE="DISPLAY COURSE";
     public static final String FAILED_DISPLAY_COURSE="DISPLAY FAILED";
@@ -41,6 +42,9 @@ public class CAOService
     public static final String UPDATE_CURRENT="UPDATE CURRENT";
     public static final String FAILED_UPDATE_CURRENT="FAILED UPDATE CURRENT";
     public static final String SUCCESSFUL_UPDATE_CURRENT="SUCCESSFUL UPDATE CURRENT";
+
+    public static final String QUIT_COMMAND="QUIT";
+    public static final String EXIT="SIGNED OFF";
 
     public static String flattenCourseList(List<Course> courseList)
     {

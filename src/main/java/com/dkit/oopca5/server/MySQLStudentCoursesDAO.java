@@ -28,6 +28,14 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         this.courses=this.courseDatabase.getCourses();
         this.students=this.studentDatabase.getStudents();
     }
+    @Override
+    public boolean isLogin() {
+        return login;
+    }
+    @Override
+    public void setLogin(boolean login) {
+        this.login = login;
+    }
 
     @Override
     public void loadFromDatabase() throws DAOException {
@@ -129,34 +137,30 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         return login;
     }
     @Override
-    public void displayCourse(String courseId)
+    public Course displayCourse(String courseId)
     {
-        String message=null;
+        Course course=null;
         for(Map.Entry<String, Course> entry : courses.entrySet())
         {
             if(courseId.equals(entry.getKey()))
             {
-                System.out.println(entry.getValue().toString());
-            }
-            else{
-                message="Course was not found";
+                course=entry.getValue();
             }
         }
-        if(message!=null)
-        {
-            System.out.println(message);
-        }
+      return course;
     }
     @Override
-    public void displayAllCourses(){
+    public List<Course> getAllCourses(){
+        List<Course> courseList=new ArrayList<>();
         for(Map.Entry<String, Course> entry : courses.entrySet())
         {
-            System.out.println(entry.getValue());
+            courseList.add(entry.getValue());
         }
+        return courseList;
     }
     @Override
-    public void displayCurrentChoices(int caoNumber){
-      
+    public List<Course> displayCurrentChoices(int caoNumber){
+      List<Course> courseList=new ArrayList<>();
             if(studentChoices.containsKey(this.caoNumber))
             {
                 for(Map.Entry<String, Course> entry : courses.entrySet())
@@ -165,12 +169,12 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
                     {
                         if(entry.getKey().equalsIgnoreCase(studentChoices.get(caoNumber).get(j)))
                         {
-                            System.out.println(entry.getValue().toString());
+                            courseList.add(entry.getValue());
                         }
                     }
                 }
             }
-
+        return courseList;
     }
 
 }

@@ -20,6 +20,9 @@ public class CAOServer
 
     public void start()
     {
+        ICourseDAOInterface ICourseDAO=new MySqlCourseDAO();
+        IStudentDAOInterface IStudentDAO=new MySqlStudentDAO();
+        IStudentCoursesDAOInterface IStudentChoicesDAO=new MySQLStudentCoursesDAO(IStudentDAO,ICourseDAO);
         try
         {
             //Set up a listening socket
@@ -33,7 +36,7 @@ public class CAOServer
                 Socket dataSocket = listeningSocket.accept();
                 clientNumber++;
                 System.out.println("Server : Client "+clientNumber+" has connected.");
-                Thread t = new Thread(new CAOClientHandler(dataSocket, clientNumber));
+                Thread t = new Thread(new CAOClientHandler(dataSocket, clientNumber,IStudentChoicesDAO,IStudentDAO,ICourseDAO));
                 t.start();
             }
         }
