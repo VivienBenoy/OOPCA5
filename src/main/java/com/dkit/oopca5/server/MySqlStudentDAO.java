@@ -11,9 +11,13 @@ import java.util.Map;
 
 public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
     private Map<Integer, Student> students;
+    private boolean login;
+    private int caoNumber;
 
     public MySqlStudentDAO(){
         students=new HashMap<>();
+        this.login=false;
+        this.caoNumber=0;
         try{
             loadFromDatabase();
         } catch (DAOException e) {
@@ -21,6 +25,23 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
         }
 
     }
+    @Override
+    public boolean isLogin() {
+        return login;
+    }
+    @Override
+    public void setLogin(boolean login) {
+        this.login = login;
+    }
+    @Override
+    public int getCaoNumber() {
+        return caoNumber;
+    }
+    @Override
+    public void setCaoNumber(int caoNumber) {
+        this.caoNumber = caoNumber;
+    }
+
     @Override
     public Map<Integer, Student> getStudents() {
         return students;
@@ -76,21 +97,62 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
     }
 
     @Override
-    public void registerStudent(int caoNumber,String dateOfbirth,String password) throws DAOException {
+    public void registerStudent(int caoNumber,String dateOfbirth,String password){
+       if(!students.containsKey(caoNumber))
+       {
+           Student student=new Student(caoNumber,dateOfbirth,password);
+           students.put(caoNumber,student);
+           try {
+              if(saveToDatabase(student));
+               {
+                   this.login=true;
+                   this.caoNumber=caoNumber;
+               }
+           } catch (DAOException e) {
+               System.out.println(e.getMessage());
+           }
+
+       }
+       else{
+           System.out.println("Student with that caoNumber already exists.");
+       }
+    }
+    @Override
+    public boolean login(int caoNumber,String dateOfBirth,String password)
+    {
+        for(Map.Entry<Integer, Student> entry : students.entrySet())
+        {
+            if(caoNumber== entry.getKey() && dateOfBirth.equals(entry.getValue().getDateOfBirth()) && password.equals(entry.getValue().getPassword()))
+            {
+                login=true;
+                this.caoNumber=caoNumber;
+            }
+        }
+        return login;
+    }
+
+    @Override
+    public boolean saveToDatabase(Student student) throws DAOException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        boolean saved = false;
 
         try
         {
             con = this.getConnection();
-            String query = "insert into student(caoNumber,date_of_birth,password) values('"+caoNumber+"','"+dateOfbirth+"','"+password+"')";
+            String query = "INSERT INTO STUDENT VALUES (?,?,?)";
             ps = con.prepareStatement(query);
-            rs = ps.executeQuery();
+
+            ps.setInt(1, student.getCaoNumber());
+            ps.setString(2, student.getDateOfBirth());
+            ps.setString(3, student.getPassword());
+            saved =(ps.executeUpdate()==1);
+
 
         } catch (SQLException se)
         {
-            throw new DAOException("registerStudent() " + se.getMessage());
+            throw new DAOException("loadFromDatabase() " + se.getMessage());
         } finally
         {
             try
@@ -109,8 +171,9 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
                 }
             } catch (SQLException se)
             {
-                throw new DAOException("registerStudent() finally " + se.getMessage());
+                throw new DAOException("loadFromDatabase() finally " + se.getMessage());
             }
         }
+        return saved;
     }
 }

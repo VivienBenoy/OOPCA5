@@ -10,6 +10,10 @@ import com.dkit.oopca5.core.CAOService;
 import com.dkit.oopca5.core.Colours;
 import com.dkit.oopca5.server.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -24,15 +28,18 @@ public class CAOClient
         new CAOClient() .start();
     }
     private void start(){
-        ICourseDAOInterface ICourseDAO=new MySqlCourseDAO();
-        IStudentDAOInterface IStudentDAO=new MySqlStudentDAO();
-        IStudentCoursesDAOInterface IStudentChoicesDAO=new MySQLStudentCoursesDAO(IStudentDAO,ICourseDAO);
 
+        try
+        {
+            Socket dataSocket=new Socket(CAOService.HOSTNAME,CAOService.PORT_NUM);
+            Scanner serverIn = new Scanner(dataSocket.getInputStream());
+            PrintWriter serverOut = new PrintWriter(dataSocket.getOutputStream(), true);
         MainMenu selectedOption=MainMenu.Continue;
         String message;
+        String response;
         while(selectedOption!=MainMenu.Quit)
         {
-            try{
+
                 printMainMenu();
 
                 selectedOption=MainMenu.values()[Integer.parseInt(keyboard.nextLine().trim())];
@@ -40,33 +47,55 @@ public class CAOClient
                 {
                     case Register:
                         message=RegisterNow();
-                        System.out.println(Colours.BLUE+"Now Registered as a new Student"+Colours.RESET);
-                        loggedinMenu(IStudentChoicesDAO);
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println("Response: "+response);
+                        if(response.equals(CAOService.SUCCESSFUL_REGISTER))
+                        {
+                            loggedinMenu(dataSocket,serverIn,serverOut);
+                        }
                         break;
                     case Log_In:
                         message=loginDetails();
-                        loggedinMenu(IStudentChoicesDAO);
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println("Response: "+response);
+                        if(response.equals(CAOService.SUCCESSFUL_LOGIN))
+                        {
+                            loggedinMenu(dataSocket,serverIn,serverOut);
+                        }
+                        break;
+                    case Quit:
+                        message=CAOService.QUIT_COMMAND;
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println(response);
                         break;
                 }
             }
-            catch(InputMismatchException ime)
-            {
-                System.out.println(Colours.RED+"Please try again"+Colours.RESET);
-            }
-            catch(NumberFormatException nfe)
-            {
-                System.out.println(Colours.RED+"Please try again"+Colours.RESET);
-            }
-            catch(ArrayIndexOutOfBoundsException aie)
-            {
-                System.out.println(aie.getMessage());
-            }
+
+        } catch(InputMismatchException ime)
+        {
+            System.out.println(Colours.RED+"Please try again"+Colours.RESET);
+        }
+        catch(NumberFormatException nfe)
+        {
+            System.out.println(Colours.RED+"Please try again"+Colours.RESET);
+        }
+        catch(ArrayIndexOutOfBoundsException aie)
+        {
+            System.out.println(aie.getMessage());
+        } catch (UnknownHostException uhe) {
+            System.out.println(uhe.getMessage());
+        } catch (IOException ioe) {
+            System.out.println(ioe.getMessage());
         }
     }
 
-    private void loggedinMenu(IStudentCoursesDAOInterface IStudentChoicesDAO) {
+    private void loggedinMenu(Socket dataSocket,Scanner serverIn,PrintWriter serverOut) {
         LoggedInMenu selectedOption=LoggedInMenu.Continue;
         String message;
+        String response;
         while(selectedOption!=LoggedInMenu.Quit)
         {
             try {
@@ -75,25 +104,36 @@ public class CAOClient
                 switch (selectedOption) {
                     case Logout:
                         message=CAOService.LOGOUT;
-                        System.out.println(CAOService.SUCCESSFUL_LOGOUT);
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println("Response: "+response);
+                        selectedOption=LoggedInMenu.Quit;
                         break;
                     case Display_Course:
                         System.out.println("Please Enter CourseID");
                         String courseID=keyboard.nextLine();
                         message=CAOService.DISPLAY_COURSE+CAOService.BREAKING_CHARACTER+courseID;
-                        System.out.println(CAOService.DISPLAY_COURSE+CAOService.BREAKING_CHARACTER+"DK110");
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println("Response: "+response);
                         break;
                     case Display_all_courses:
                         message=CAOService.DISPLAY_ALL;
-                        System.out.println(CAOService.SUCCESSFUL_DISPLAY_ALL+CAOService.BREAKING_CHARACTER+"DK110....##DK980");
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println("Response: "+response);
                         break;
                     case Display_current_choices:
                         message=CAOService.DISPLAY_CURRENT+CAOService.BREAKING_CHARACTER+loggedInCAONumber;
-                        System.out.println(CAOService.SUCCESSFUL_DISPLAY_CURRENT+CAOService.BREAKING_CHARACTER+"DK110");
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println("Response: "+response);
                         break;
                     case Update_current_choices:
                         message=updateChoices();
-                        System.out.println(CAOService.SUCCESSFUL_UPDATE_CURRENT+CAOService.BREAKING_CHARACTER+"12345678"+CAOService.BREAKING_CHARACTER+"DK110");
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println("Response: "+response);
                          break;
 
                 }
@@ -115,22 +155,15 @@ public class CAOClient
     private String RegisterNow()
     {
         StringBuffer message=new StringBuffer(CAOService.REGISTER_COMMAND);
-        int caoNumber=0;
-        String dateOfBirth="";
-        String password="";
-        enterDetails(caoNumber,dateOfBirth,password);
-        System.out.println(CAOService.SUCCESSFUL_REGISTER);
-        return appendMessage(message,caoNumber,dateOfBirth,password);
+
+        return enterDetails(message);
+
     }
     private String loginDetails()
     {
         StringBuffer message=new StringBuffer(CAOService.LOGIN_COMMAND);
-        int caoNumber=0;
-        String dateOfBirth="";
-        String password="";
-        enterDetails(caoNumber,dateOfBirth,password);
-        System.out.println(CAOService.SUCCESSFUL_LOGIN);
-        return appendMessage(message,caoNumber,dateOfBirth,password);
+
+        return enterDetails(message);
     }
     public String appendMessage(StringBuffer message,int caoNumber,String dateOfBirth,String password)
     {
@@ -142,12 +175,15 @@ public class CAOClient
         message.append(password);
         return message.toString();
     }
-    public void enterDetails(int caoNumber,String dateOfBirth,String password)
+    public String enterDetails(StringBuffer message)
     {
         boolean checkInput=true;
         boolean caoNumbercheck=false;
         boolean dateOfBirthcheck=false;
         boolean passwordcheck=false;
+        int caoNumber=0;
+        String dateOfBirth="";
+        String password="";
         RegexChecker inputValidation=new RegexChecker();
         try{
             while(checkInput) {
@@ -200,14 +236,15 @@ public class CAOClient
         {
             System.out.println(e.getMessage());
         }
+        return appendMessage(message,caoNumber,dateOfBirth,password);
     }
     public String updateChoices()
     {
         boolean trueValue=true;
         StringBuffer message=new StringBuffer(CAOService.UPDATE_CURRENT);
         System.out.println("Please Enter Your Choice of Courses");
-        while(trueValue)
-        {
+       // while(trueValue)
+        //{
 
             String input=keyboard.nextLine();
             String[] data=input.split(",");
@@ -216,11 +253,9 @@ public class CAOClient
                 message.append(CAOService.BREAKING_CHARACTER);
                 message.append(data[i]);
             }
-
-
-        }
-    return message.toString();
-
+//            trueValue=false;
+       // }
+        return message.toString();
     }
 
 

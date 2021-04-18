@@ -10,24 +10,19 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesDAOInterface {
-    private IStudentDAOInterface studentDatabase;
-    private ICourseDAOInterface courseDatabase;
-
     private Map<Integer, List<String>> studentChoices;
-    private Map<String, Course> courses;
-    private Map<Integer, Student> students;
-    private boolean login;
-    private int caoNumber;
 
-    public MySQLStudentCoursesDAO(IStudentDAOInterface studentDatabase, ICourseDAOInterface courseDatabase) {
-        this.studentDatabase = studentDatabase;
-        this.courseDatabase = courseDatabase;
-        this.login=false;
-        this.caoNumber=0;
+
+    public MySQLStudentCoursesDAO() {
+
         this.studentChoices=new HashMap<>();
-        this.courses=this.courseDatabase.getCourses();
-        this.students=this.studentDatabase.getStudents();
+        try{
+            loadFromDatabase();
+        } catch (DAOException e) {
+            System.out.println(e.getMessage());
+        }
     }
+
 
     @Override
     public void loadFromDatabase() throws DAOException {
@@ -38,7 +33,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         try
         {
             con = this.getConnection();
-            String query = "select * from student_choices";
+            String query = "select * from student_courses";
             ps = con.prepareStatement(query);
             rs = ps.executeQuery();
 
@@ -55,7 +50,6 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
                     courses.add(courseID);
                     studentChoices.put(caoNumber,courses);
                 }
-
             }
         } catch (SQLException se)
         {
@@ -82,95 +76,130 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
             }
         }
     }
-@Override
-   public void updateChoices(List<String> courseID)
+    @Override
+   public void updateChoices(List<String> courseID,int caoNumber)
    {
        if(studentChoices.containsKey(caoNumber))
        {
-           if(studentChoices.get(caoNumber)!=null)
-           {
-               removeStudentChoices(caoNumber);
-           }
            try{
+           if(!studentChoices.get(caoNumber).isEmpty())
+           {
+               studentChoices.get(caoNumber).clear();
+               deleteFromDatabase(caoNumber);
+           }
+
+
                for(int i=0;i<courseID.size();i++)
                {
                    studentChoices.get(caoNumber).add(courseID.get(i));
+                   saveToDatabase(caoNumber,courseID.get(i));
                }
-
            }
-           catch(NullPointerException npe)
+           catch(NullPointerException | DAOException npe)
            {
                System.out.println(npe.getMessage());
            }
-
        }
        else
        {
            studentChoices.put(caoNumber,courseID);
        }
    }
-    public void removeStudentChoices(int caoNumber){
-        for(int i=0;i<studentChoices.get(caoNumber).size();i++)
-        {
-            studentChoices.get(caoNumber).remove(i);
-        }
-    }
+
     @Override
-    public boolean login(int caoNumber,String dateOfBirth,String password)
-    {
-        for(Map.Entry<Integer, Student> entry : students.entrySet())
-        {
-            if(caoNumber== entry.getKey() && dateOfBirth.equals(entry.getValue().getDateOfBirth()) && password.equals(entry.getValue().getPassword()))
+    public List<String> displayCurrentChoices(int caoNumber){
+      List<String> courseList=new ArrayList<>();
+            if(studentChoices.containsKey(caoNumber))
             {
-                login=true;
-                this.caoNumber=caoNumber;
-            }
-        }
-        return login;
-    }
-    @Override
-    public void displayCourse(String courseId)
-    {
-        String message=null;
-        for(Map.Entry<String, Course> entry : courses.entrySet())
-        {
-            if(courseId.equals(entry.getKey()))
-            {
-                System.out.println(entry.getValue().toString());
-            }
-            else{
-                message="Course was not found";
-            }
-        }
-        if(message!=null)
-        {
-            System.out.println(message);
-        }
-    }
-    @Override
-    public void displayAllCourses(){
-        for(Map.Entry<String, Course> entry : courses.entrySet())
-        {
-            System.out.println(entry.getValue());
-        }
-    }
-    @Override
-    public void displayCurrentChoices(int caoNumber){
-      
-            if(studentChoices.containsKey(this.caoNumber))
-            {
-                for(Map.Entry<String, Course> entry : courses.entrySet())
+                for(int j=0;j<studentChoices.get(caoNumber).size();j++)
                 {
-                    for(int j=0;j<studentChoices.get(caoNumber).size();j++)
-                    {
-                        if(entry.getKey().equalsIgnoreCase(studentChoices.get(caoNumber).get(j)))
-                        {
-                            System.out.println(entry.getValue().toString());
-                        }
-                    }
+                    courseList.add(studentChoices.get(caoNumber).get(j));
                 }
             }
-
+        return courseList;
     }
 
+    @Override
+    public void saveToDatabase(int caoNumber,String courseID) throws DAOException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean saved=false;
+
+        try
+        {
+            con = this.getConnection();
+            String query="INSERT INTO STUDENT_COURSES VALUES(?,?)";
+                ps = con.prepareStatement(query);
+                ps.setInt(1,caoNumber);
+                ps.setString(2,courseID);
+                saved=ps.executeUpdate()==1;
+
+        } catch (SQLException se)
+        {
+            throw new DAOException("saveToDatabase() " + se.getMessage());
+        } finally
+        {
+            try
+            {
+                if (rs != null)
+                {
+                    rs.close();
+                }
+                if (ps != null)
+                {
+                    ps.close();
+                }
+                if (con != null)
+                {
+                    freeConnection(con);
+                }
+            } catch (SQLException se)
+            {
+                throw new DAOException("saveToDatabase() finally " + se.getMessage());
+            }
+        }
+    }
+    public void deleteFromDatabase(int caoNumber) throws DAOException
+    {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean saved=false;
+
+        try
+        {
+            con = this.getConnection();
+            String query1 = "delete from student_courses where caoNumber = "+caoNumber;
+            ps = con.prepareStatement(query1);
+            saved=ps.executeUpdate()==1;
+
+
+
+        } catch (SQLException se)
+        {
+            throw new DAOException("DeleteFromDatabase() " + se.getMessage());
+        } finally
+        {
+            try
+            {
+                if (rs != null)
+                {
+                    rs.close();
+                }
+                if (ps != null)
+                {
+                    ps.close();
+                }
+
+                if (con != null)
+                {
+                    freeConnection(con);
+                }
+            } catch (SQLException se)
+            {
+                throw new DAOException("DeleteFromDatabase() finally " + se.getMessage());
+            }
+        }
+    }
 }

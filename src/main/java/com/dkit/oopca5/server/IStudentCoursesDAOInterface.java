@@ -1,15 +1,14 @@
 package com.dkit.oopca5.server;
 
+import com.dkit.oopca5.core.dto.Course;
+
 import java.util.List;
 
 public interface IStudentCoursesDAOInterface {
     public void loadFromDatabase() throws DAOException;
-    public boolean login(int caoNumber,String dateOfBirth,String password);
-    public void displayCourse(String courseId);
-    public void displayAllCourses();
-    public void displayCurrentChoices(int caoNumber);
-    public void updateChoices(List<String> courseID);
-
+    public List<String> displayCurrentChoices(int caoNumber);
+    public void updateChoices(List<String> courseID,int caoNumber);
+    public void saveToDatabase(int caoNumber,String courseID) throws DAOException;
 
 
 }
