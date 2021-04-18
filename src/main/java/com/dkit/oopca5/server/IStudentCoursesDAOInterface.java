@@ -6,11 +6,9 @@ import java.util.List;
 
 public interface IStudentCoursesDAOInterface {
     public void loadFromDatabase() throws DAOException;
-
-
     public List<String> displayCurrentChoices(int caoNumber);
     public void updateChoices(List<String> courseID,int caoNumber);
-
+    public void saveToDatabase(int caoNumber,String courseID) throws DAOException;
 
 
 }

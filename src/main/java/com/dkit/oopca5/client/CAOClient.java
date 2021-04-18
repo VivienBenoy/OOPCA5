@@ -50,14 +50,26 @@ public class CAOClient
                         serverOut.println(message);
                         response=serverIn.nextLine();
                         System.out.println("Response: "+response);
-                        loggedinMenu(dataSocket,serverIn,serverOut);
+                        if(response.equals(CAOService.SUCCESSFUL_REGISTER))
+                        {
+                            loggedinMenu(dataSocket,serverIn,serverOut);
+                        }
                         break;
                     case Log_In:
                         message=loginDetails();
                         serverOut.println(message);
                         response=serverIn.nextLine();
                         System.out.println("Response: "+response);
-                        loggedinMenu(dataSocket,serverIn,serverOut);
+                        if(response.equals(CAOService.SUCCESSFUL_LOGIN))
+                        {
+                            loggedinMenu(dataSocket,serverIn,serverOut);
+                        }
+                        break;
+                    case Quit:
+                        message=CAOService.QUIT_COMMAND;
+                        serverOut.println(message);
+                        response=serverIn.nextLine();
+                        System.out.println(response);
                         break;
                 }
             }
@@ -95,6 +107,7 @@ public class CAOClient
                         serverOut.println(message);
                         response=serverIn.nextLine();
                         System.out.println("Response: "+response);
+                        selectedOption=LoggedInMenu.Quit;
                         break;
                     case Display_Course:
                         System.out.println("Please Enter CourseID");

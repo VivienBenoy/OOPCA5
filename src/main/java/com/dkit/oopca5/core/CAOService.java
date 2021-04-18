@@ -44,7 +44,7 @@ public class CAOService
     public static final String SUCCESSFUL_UPDATE_CURRENT="SUCCESSFUL UPDATE CURRENT";
 
     public static final String QUIT_COMMAND="QUIT";
-    public static final String EXIT="SIGNED OFF";
+    public static final String EXIT="EXITING SYSTEM";
 
     public static String flattenCourseList(List<Course> courseList)
     {

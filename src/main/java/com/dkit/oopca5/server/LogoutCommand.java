@@ -11,6 +11,7 @@ public class LogoutCommand implements ICommand{
             if(studentDAO.isLogin())
             {
                 studentDAO.setLogin(false);
+                studentDAO.setCaoNumber(0);
             }
             if(!studentDAO.isLogin())
             {

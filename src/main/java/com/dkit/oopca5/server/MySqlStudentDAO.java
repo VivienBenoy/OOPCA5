@@ -37,6 +37,10 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
     public int getCaoNumber() {
         return caoNumber;
     }
+    @Override
+    public void setCaoNumber(int caoNumber) {
+        this.caoNumber = caoNumber;
+    }
 
     @Override
     public Map<Integer, Student> getStudents() {
@@ -98,6 +102,16 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
        {
            Student student=new Student(caoNumber,dateOfbirth,password);
            students.put(caoNumber,student);
+           try {
+              if(saveToDatabase(student));
+               {
+                   this.login=true;
+                   this.caoNumber=caoNumber;
+               }
+           } catch (DAOException e) {
+               System.out.println(e.getMessage());
+           }
+
        }
        else{
            System.out.println("Student with that caoNumber already exists.");
@@ -115,5 +129,51 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
             }
         }
         return login;
+    }
+
+    @Override
+    public boolean saveToDatabase(Student student) throws DAOException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        boolean saved = false;
+
+        try
+        {
+            con = this.getConnection();
+            String query = "INSERT INTO STUDENT VALUES (?,?,?)";
+            ps = con.prepareStatement(query);
+
+            ps.setInt(1, student.getCaoNumber());
+            ps.setString(2, student.getDateOfBirth());
+            ps.setString(3, student.getPassword());
+            saved =(ps.executeUpdate()==1);
+
+
+        } catch (SQLException se)
+        {
+            throw new DAOException("loadFromDatabase() " + se.getMessage());
+        } finally
+        {
+            try
+            {
+                if (rs != null)
+                {
+                    rs.close();
+                }
+                if (ps != null)
+                {
+                    ps.close();
+                }
+                if (con != null)
+                {
+                    freeConnection(con);
+                }
+            } catch (SQLException se)
+            {
+                throw new DAOException("loadFromDatabase() finally " + se.getMessage());
+            }
+        }
+        return saved;
     }
 }

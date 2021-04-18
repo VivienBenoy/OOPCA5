@@ -13,4 +13,6 @@ public interface IStudentDAOInterface {
     public boolean isLogin();
     public void setLogin(boolean login);
     public int getCaoNumber();
+    public void setCaoNumber(int caoNumber);
+    public boolean saveToDatabase(Student student) throws DAOException;
 }
