@@ -22,7 +22,7 @@ public class CAOServer
     {
         ICourseDAOInterface ICourseDAO=new MySqlCourseDAO();
         IStudentDAOInterface IStudentDAO=new MySqlStudentDAO();
-        IStudentCoursesDAOInterface IStudentChoicesDAO=new MySQLStudentCoursesDAO(IStudentDAO,ICourseDAO);
+        IStudentCoursesDAOInterface IStudentChoicesDAO=new MySQLStudentCoursesDAO();
         try
         {
             //Set up a listening socket

@@ -20,7 +20,7 @@ public class RegexChecker
         return false;
     }
     public boolean verifyDateOfBirth(String dateOfBirth){
-        String regExDateOfBirth="^\\d{4}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$";
+        String regExDateOfBirth="^([12])\\d{3}\\-(0[1-9]|1[012])\\-(0[1-9]|[12][0-9]|3[01])$";
         Pattern patternDateOfBirth=Pattern.compile(regExDateOfBirth);
         Matcher matcherDateOfBirth= patternDateOfBirth.matcher(dateOfBirth);
         if(matcherDateOfBirth.matches())

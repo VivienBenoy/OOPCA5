@@ -8,11 +8,11 @@ public class LogoutCommand implements ICommand{
         String response=null;
         if(components.length==1)
         {
-            if(studentCourseDAO.isLogin())
+            if(studentDAO.isLogin())
             {
-                studentCourseDAO.setLogin(false);
+                studentDAO.setLogin(false);
             }
-            if(!studentCourseDAO.isLogin())
+            if(!studentDAO.isLogin())
             {
                 response=CAOService.SUCCESSFUL_LOGOUT;
             }

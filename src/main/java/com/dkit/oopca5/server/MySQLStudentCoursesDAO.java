@@ -10,32 +10,19 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesDAOInterface {
-    private IStudentDAOInterface studentDatabase;
-    private ICourseDAOInterface courseDatabase;
-
     private Map<Integer, List<String>> studentChoices;
-    private Map<String, Course> courses;
-    private Map<Integer, Student> students;
-    private boolean login;
-    private int caoNumber;
 
-    public MySQLStudentCoursesDAO(IStudentDAOInterface studentDatabase, ICourseDAOInterface courseDatabase) {
-        this.studentDatabase = studentDatabase;
-        this.courseDatabase = courseDatabase;
-        this.login=false;
-        this.caoNumber=0;
+
+    public MySQLStudentCoursesDAO() {
+
         this.studentChoices=new HashMap<>();
-        this.courses=this.courseDatabase.getCourses();
-        this.students=this.studentDatabase.getStudents();
+        try{
+            loadFromDatabase();
+        } catch (DAOException e) {
+            System.out.println(e.getMessage());
+        }
     }
-    @Override
-    public boolean isLogin() {
-        return login;
-    }
-    @Override
-    public void setLogin(boolean login) {
-        this.login = login;
-    }
+
 
     @Override
     public void loadFromDatabase() throws DAOException {
@@ -46,7 +33,7 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         try
         {
             con = this.getConnection();
-            String query = "select * from student_choices";
+            String query = "select * from student_courses";
             ps = con.prepareStatement(query);
             rs = ps.executeQuery();
 
@@ -63,7 +50,6 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
                     courses.add(courseID);
                     studentChoices.put(caoNumber,courses);
                 }
-                System.out.println(studentChoices.toString());
             }
         } catch (SQLException se)
         {
@@ -91,87 +77,40 @@ public class MySQLStudentCoursesDAO extends MySqlDAO implements IStudentCoursesD
         }
     }
 @Override
-   public void updateChoices(List<String> courseID)
+   public void updateChoices(List<String> courseID,int caoNumber)
    {
        if(studentChoices.containsKey(caoNumber))
        {
-           if(studentChoices.get(caoNumber)!=null)
+           if(!studentChoices.get(caoNumber).isEmpty())
            {
-               removeStudentChoices(caoNumber);
+               studentChoices.get(caoNumber).clear();
            }
            try{
                for(int i=0;i<courseID.size();i++)
                {
                    studentChoices.get(caoNumber).add(courseID.get(i));
                }
-
            }
            catch(NullPointerException npe)
            {
                System.out.println(npe.getMessage());
            }
-
        }
        else
        {
            studentChoices.put(caoNumber,courseID);
        }
    }
-    public void removeStudentChoices(int caoNumber){
-        for(int i=0;i<studentChoices.get(caoNumber).size();i++)
-        {
-            studentChoices.get(caoNumber).remove(i);
-        }
-    }
+
+
     @Override
-    public boolean login(int caoNumber,String dateOfBirth,String password)
-    {
-        for(Map.Entry<Integer, Student> entry : students.entrySet())
-        {
-            if(caoNumber== entry.getKey() && dateOfBirth.equals(entry.getValue().getDateOfBirth()) && password.equals(entry.getValue().getPassword()))
+    public List<String> displayCurrentChoices(int caoNumber){
+      List<String> courseList=new ArrayList<>();
+            if(studentChoices.containsKey(caoNumber))
             {
-                login=true;
-                this.caoNumber=caoNumber;
-            }
-        }
-        return login;
-    }
-    @Override
-    public Course displayCourse(String courseId)
-    {
-        Course course=null;
-        for(Map.Entry<String, Course> entry : courses.entrySet())
-        {
-            if(courseId.equals(entry.getKey()))
-            {
-                course=entry.getValue();
-            }
-        }
-      return course;
-    }
-    @Override
-    public List<Course> getAllCourses(){
-        List<Course> courseList=new ArrayList<>();
-        for(Map.Entry<String, Course> entry : courses.entrySet())
-        {
-            courseList.add(entry.getValue());
-        }
-        return courseList;
-    }
-    @Override
-    public List<Course> displayCurrentChoices(int caoNumber){
-      List<Course> courseList=new ArrayList<>();
-            if(studentChoices.containsKey(this.caoNumber))
-            {
-                for(Map.Entry<String, Course> entry : courses.entrySet())
+                for(int j=0;j<studentChoices.get(caoNumber).size();j++)
                 {
-                    for(int j=0;j<studentChoices.get(caoNumber).size();j++)
-                    {
-                        if(entry.getKey().equalsIgnoreCase(studentChoices.get(caoNumber).get(j)))
-                        {
-                            courseList.add(entry.getValue());
-                        }
-                    }
+                    courseList.add(studentChoices.get(caoNumber).get(j));
                 }
             }
         return courseList;

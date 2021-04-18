@@ -12,10 +12,14 @@ public class DisplayCurrentCommand implements ICommand {
         if(components.length==2)
         {
             int caoNumber=Integer.parseInt(components[1]);
-            List<Course> courseList=studentCourseDAO.displayCurrentChoices(caoNumber);
+            List<String> courseList=studentCourseDAO.displayCurrentChoices(caoNumber);
             if(!courseList.isEmpty())
             {
-                response= CAOService.SUCCESSFUL_DISPLAY_CURRENT+CAOService.BREAKING_CHARACTER+CAOService.flattenCourseList(courseList);
+                response=CAOService.SUCCESSFUL_DISPLAY_CURRENT;
+                for(int i=0;i<courseList.size();i++)
+                {
+                    response+= CAOService.BREAKING_CHARACTER+courseList.get(i);
+                }
             }
             else
             {

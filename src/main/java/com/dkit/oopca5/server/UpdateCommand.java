@@ -18,7 +18,7 @@ public class UpdateCommand implements ICommand{
             }
             if(!courses.isEmpty())
             {
-                studentCourseDAO.updateChoices(courses);
+                studentCourseDAO.updateChoices(courses,studentDAO.getCaoNumber());
                 response= CAOService.SUCCESSFUL_UPDATE_CURRENT;
             }
             else

@@ -230,8 +230,8 @@ public class CAOClient
         boolean trueValue=true;
         StringBuffer message=new StringBuffer(CAOService.UPDATE_CURRENT);
         System.out.println("Please Enter Your Choice of Courses");
-        while(trueValue)
-        {
+       // while(trueValue)
+        //{
 
             String input=keyboard.nextLine();
             String[] data=input.split(",");
@@ -240,11 +240,9 @@ public class CAOClient
                 message.append(CAOService.BREAKING_CHARACTER);
                 message.append(data[i]);
             }
-
-
-        }
-    return message.toString();
-
+//            trueValue=false;
+       // }
+        return message.toString();
     }
 
 

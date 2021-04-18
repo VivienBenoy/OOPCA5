@@ -12,10 +12,10 @@ public class MySQLStudentCoursesDAOTest {
     public void login() {
         ICourseDAOInterface ICourseDAO=new MySqlCourseDAO();
         IStudentDAOInterface IStudentDAO=new MySqlStudentDAO();
-        IStudentCoursesDAOInterface IStudentChoicesDAO=new MySQLStudentCoursesDAO(IStudentDAO,ICourseDAO);
+        IStudentCoursesDAOInterface IStudentChoicesDAO=new MySQLStudentCoursesDAO();
         Student student=new Student(11112222,"2000-10-10","Green1234");
         IStudentDAO.getStudents().put(11112222,student);
-        assertEquals(true,IStudentChoicesDAO.login(11112222,"2000-10-10","Green1234"));
+        assertEquals(true,IStudentDAO.login(11112222,"2000-10-10","Green1234"));
     }
 
 }

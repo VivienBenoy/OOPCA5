@@ -78,4 +78,26 @@ public class MySqlCourseDAO extends MySqlDAO implements ICourseDAOInterface {
             }
         }
     }
+    @Override
+    public Course displayCourse(String courseId)
+    {
+        Course course=null;
+        for(Map.Entry<String, Course> entry : courses.entrySet())
+        {
+            if(courseId.equals(entry.getKey()))
+            {
+                course=entry.getValue();
+            }
+        }
+        return course;
+    }
+    @Override
+    public List<Course> getAllCourses(){
+        List<Course> courseList=new ArrayList<>();
+        for(Map.Entry<String, Course> entry : courses.entrySet())
+        {
+            courseList.add(entry.getValue());
+        }
+        return courseList;
+    }
 }

@@ -10,7 +10,7 @@ public class DisplayCommand implements ICommand {
         if(components.length==2)
         {
             String courseID=components[1];
-            Course course=studentCourseDAO.displayCourse(courseID);
+            Course course=courseDAO.displayCourse(courseID);
             response=course.format();
             if(!courseDAO.getCourses().containsKey(courseID))
             {

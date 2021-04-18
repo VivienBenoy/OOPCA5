@@ -13,8 +13,8 @@ public class LoginCommand implements ICommand {
                 int caoNumber = Integer.parseInt(components[1]);
                 String dateOfbirth = components[2];
                 String password = components[3];
-                studentCourseDAO.login(caoNumber,dateOfbirth,password);
-                login=studentCourseDAO.isLogin();
+                studentDAO.login(caoNumber,dateOfbirth,password);
+                login=studentDAO.isLogin();
                 if(login)
                 {
                     response= CAOService.SUCCESSFUL_LOGIN;

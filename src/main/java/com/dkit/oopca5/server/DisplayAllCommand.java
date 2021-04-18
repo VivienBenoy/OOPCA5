@@ -11,7 +11,7 @@ public class DisplayAllCommand implements ICommand {
         String response=null;
         if(components.length==1);
         {
-            List<Course> courses=studentCourseDAO.getAllCourses();
+            List<Course> courses=courseDAO.getAllCourses();
             if(!courses.isEmpty())
             {
                 response= CAOService.SUCCESSFUL_DISPLAY_ALL+CAOService.BREAKING_CHARACTER+CAOService.flattenCourseList(courses);

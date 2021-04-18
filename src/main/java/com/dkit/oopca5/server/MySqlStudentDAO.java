@@ -11,9 +11,13 @@ import java.util.Map;
 
 public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
     private Map<Integer, Student> students;
+    private boolean login;
+    private int caoNumber;
 
     public MySqlStudentDAO(){
         students=new HashMap<>();
+        this.login=false;
+        this.caoNumber=0;
         try{
             loadFromDatabase();
         } catch (DAOException e) {
@@ -21,6 +25,19 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
         }
 
     }
+    @Override
+    public boolean isLogin() {
+        return login;
+    }
+    @Override
+    public void setLogin(boolean login) {
+        this.login = login;
+    }
+    @Override
+    public int getCaoNumber() {
+        return caoNumber;
+    }
+
     @Override
     public Map<Integer, Student> getStudents() {
         return students;
@@ -85,5 +102,18 @@ public class MySqlStudentDAO extends MySqlDAO implements IStudentDAOInterface{
        else{
            System.out.println("Student with that caoNumber already exists.");
        }
+    }
+    @Override
+    public boolean login(int caoNumber,String dateOfBirth,String password)
+    {
+        for(Map.Entry<Integer, Student> entry : students.entrySet())
+        {
+            if(caoNumber== entry.getKey() && dateOfBirth.equals(entry.getValue().getDateOfBirth()) && password.equals(entry.getValue().getPassword()))
+            {
+                login=true;
+                this.caoNumber=caoNumber;
+            }
+        }
+        return login;
     }
 }
